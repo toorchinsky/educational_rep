@@ -9,6 +9,11 @@ public class Program_23 {
         productsArray[2] = new Product("Samsung S23 Ultra", "01.02.2023", "Samsung Corp.", "Korea", 3599, false);
         productsArray[3] = new Product("Samsung S22 Ultra", "01.02.2022", "Samsung Corp.", "Korea", 2599, false);
         productsArray[4] = new Product("Samsung S21 Ultra", "01.02.2021", "Samsung Corp.", "Korea", 1599, false);
+
+        Park park = new Park();
+        Park.Attractions attraction1 = park.new Attractions("Колесо обозрения", "10:00-22:00", 400);
+        // attraction1.printAttractions();
+
     }
 
     // Задание 1
@@ -42,14 +47,23 @@ public class Program_23 {
 
     // Задание 3
     public static class Park{
-        private String attraction;
-        private String workHours;
-        private int attractionPrice;
-        public Park(String attraction, String workHours, int attractionPrice){
-            this.attraction = attraction;
-            this.workHours = workHours;
-            this.attractionPrice = attractionPrice;
+        public class Attractions{
+            private String attractionName;
+            private String workHours;
+            private int attractionPrice;
+
+            public Attractions(String attractionName, String workHours, int attractionPrice){
+                this.attractionName = attractionName;
+                this.workHours = workHours;
+                this.attractionPrice = attractionPrice;
+            }
+            // public void printAttractions() {
+            //     System.out.println(attractionName);
+            //     System.out.println(workHours);
+            //     System.out.println(attractionPrice);
+            // }
         }
+        
     }
 
 
