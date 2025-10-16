@@ -1,70 +1,83 @@
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 public class ProgramTest {
 
-    @Test
-    public void factorialPositive() {
-        long actual = Calculations.factorial(10);
-        Assert.assertEquals(actual, 3628800);
+    @BeforeAll
+    public static void setup() {
+        RestAssured.baseURI = "https://postman-echo.com";
     }
 
     @Test
-    public void factorialZero() {
-        long actual = Calculations.factorial(0);
-        Assert.assertEquals(actual, 1);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void factorialNegative() {
-        Calculations.factorial(-10);
+    public void testGetRequest() {
+        Response response = given().get("/get");
+        response.then().statusCode(200);
+        response.then().body("url", equalTo("https://postman-echo.com/get"));
     }
 
     @Test
-    public void triangleAreaPositive() {
-        int actual = Calculations.triangleArea(14, 14);
-        Assert.assertEquals(actual, 98);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void triangleAreaZero() {
-        Calculations.triangleArea(0, 0);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void triangleAreaHalfZero() {
-        Calculations.triangleArea(5, 0);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void triangleAreaNegative() {
-        Calculations.triangleArea(-15, -15);
+    public void testGetWithParameters() {
+        Response response = given()
+                .param("foo1", "bar1")
+                .param("foo2", "bar2")
+                .get("/get");
+        response.then().statusCode(200);
+        response.then().body("url", equalTo("https://postman-echo.com/get?foo1=bar1&foo2=bar2"));
+        response.then().body("args.foo1", equalTo("bar1"));
+        response.then().body("args.foo2", equalTo("bar2"));
     }
 
     @Test
-    public void arrayPositive() {
-        int[] actual = Calculations.arithmeticOperations(50, 50);
-        Assert.assertEquals(actual, new int[]{100, 0, 1, 2500});
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void arrayZero() {
-        Calculations.arithmeticOperations(0, 1);
-    }
-
-    @Test
-    public void arrayNegative() {
-        int[] actual = Calculations.arithmeticOperations(-50, -50);
-        Assert.assertEquals(actual, new int[]{-100, 0, 1, 2500});
+    public void testPostRawText() {
+        String requestBody = "This is expected to be sent back as part of response body.";
+        Response response = given().body(requestBody).post("/post");
+        response.then().statusCode(200);
+        response.then().body("data", equalTo(requestBody));
+        response.then().body("url", equalTo("https://postman-echo.com/post"));
     }
 
     @Test
-    public void comparisonTrue() {
-        Assert.assertTrue(Calculations.comparison(100, 100));
+    public void testPostFormData() {
+        Response response = given()
+                .contentType("application/x-www-form-urlencoded; charset=UTF-8")
+                .formParam("foo1", "bar1")
+                .formParam("foo2", "bar2")
+                .post("/post");
+        response.then().statusCode(200);
+        response.then().body("url", equalTo("https://postman-echo.com/post"));
+        response.then().body("form.foo1", equalTo("bar1"));
+        response.then().body("form.foo2", equalTo("bar2"));
     }
 
     @Test
-    public void comparisonFalse() {
-        Assert.assertFalse(Calculations.comparison(-100, 100));
+    public void testPutRequest() {
+        String requestBody = "This is expected to be sent back as part of response body.";
+        Response response = given().body(requestBody).put("/put");
+        response.then().statusCode(200);
+        response.then().body("data", equalTo(requestBody));
+        response.then().body("url", equalTo("https://postman-echo.com/put"));
+    }
+
+    @Test
+    public void testPatchRequest() {
+        String requestBody = "This is expected to be sent back as part of response body.";
+        Response response = given().body(requestBody).patch("/patch");
+        response.then().statusCode(200);
+        response.then().body("data", equalTo(requestBody));
+        response.then().body("url", equalTo("https://postman-echo.com/patch"));
+    }
+
+    @Test
+    public void testDeleteRequest() {
+        String requestBody = "This is expected to be sent back as part of response body.";
+        Response response = given().body(requestBody).delete("/delete");
+        response.then().statusCode(200);
+        response.then().body("data", equalTo(requestBody));
+        response.then().body("url", equalTo("https://postman-echo.com/delete"));
     }
 }
