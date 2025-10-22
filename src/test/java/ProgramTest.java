@@ -1,128 +1,94 @@
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProgramTest {
+    WebDriver driver;
 
-    @Test
-    @DisplayName("Тест вычисления факториала")
-    void factorialPositive(){
-        long actual = Calculations.factorial(10);
-        assertEquals(3628800, actual);
+    @BeforeAll
+    static void setupAll() {
+        WebDriverManager.chromedriver().setup();
+    }
+
+    @BeforeEach
+    void Start() throws InterruptedException {
+        driver = new ChromeDriver();
+        driver.get("https://www.mts.by/");
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebElement closeCookie = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[@class = 'cookie__buttons']//button[@class = 'btn btn_gray cookie__cancel']")
+        ));
+        closeCookie.click();
+    }
+
+    @AfterEach
+    void teardown() {
+        driver.quit();
     }
 
     @Test
-    @DisplayName("Тест 0 факториала")
-    void factorialZero(){
-        long actual = Calculations.factorial(0);
-        assertEquals(1, actual);
+    void blockNameTest() {
+        WebElement headText = driver.findElement(By.xpath("//div[@class = 'pay__wrapper']//h2"));
+        String actual = headText.getText();
+        assertEquals("Онлайн пополнение\n" +
+                "без комиссии", actual);
     }
 
     @Test
-    @DisplayName("Тест отрицательного вычисления факториала")
-    void factorialNegative(){
-        assertThrows(IllegalArgumentException.class, () -> Calculations.factorial(-10));
+    void payLogoTest(){
+        WebElement visaLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Visa']"));
+        assertTrue(visaLogo.isDisplayed());
+
+        WebElement verifiedVisaLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Verified By Visa']"));
+        assertTrue(verifiedVisaLogo.isDisplayed());
+
+        WebElement masterCardLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'MasterCard']"));
+        assertTrue(masterCardLogo.isDisplayed());
+
+        WebElement masterCardSecureLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'MasterCard Secure Code']"));
+        assertTrue(masterCardSecureLogo.isDisplayed());
+
+        WebElement belacardLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Белкарт']"));
+        assertTrue(belacardLogo.isDisplayed());
     }
 
     @Test
-    @DisplayName("Тест вычисления площади треугольника")
-    void triangleAreaPositive(){
-        int actual = Calculations.triangleArea(14, 14);
-        assertEquals(98, actual);
+    void infoLinkTest(){
+        WebElement infoLink = driver.findElement(By.xpath("//div[@class = 'pay__wrapper']//a"));
+        infoLink.click();
+        String actualLink = driver.getCurrentUrl();
+        assertEquals("https://www.mts.by/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/", actualLink);
     }
 
     @Test
-    @DisplayName("Тест на 0 значения при вычислении площади треугольника")
-    void triangleAreaZero(){
-        assertThrows(IllegalArgumentException.class, () -> Calculations.triangleArea(0, 0));
+    void payButtonTest() {
+        WebElement phoneInput = driver.findElement(By.xpath("//input[@placeholder = 'Номер телефона']"));
+        phoneInput.click();
+        phoneInput.sendKeys("297777777");
+
+        WebElement sumInput = driver.findElement(By.xpath("//form[@class = 'pay-form opened']//input[@class = 'total_rub']"));
+        sumInput.click();
+        sumInput.sendKeys("100");
+
+        WebElement сontinueButton = driver.findElement(By.xpath("//form[@class = 'pay-form opened']//button"));
+        сontinueButton.click();
+
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebElement payPopup = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath
+                        ("//app-root")));
+        assertTrue(payPopup.isDisplayed());
     }
 
-    @Test
-    @DisplayName("Тест на частино 0 значения при вычислении площади треугольника")
-    void triangleAreaHalfZero(){
-        assertThrows(IllegalArgumentException.class, () -> Calculations.triangleArea(5, 0));
-    }
-
-    @Test
-    @DisplayName("Тест на отрицательные значения при вычислении площади треугольника")
-    void triangleAreaNegative(){
-        assertThrows(IllegalArgumentException.class, () -> Calculations.triangleArea(-15, -15));
-    }
-
-    @Test
-    @DisplayName("Тест сложения положительных чисел")
-    void testAdditionPositive() {
-        assertEquals(8, Calculations.addition(5, 3));
-    }
-
-    @Test
-    @DisplayName("Тест сложения отрицательных чисел")
-    void testAdditionNegative() {
-        assertEquals(-8, Calculations.addition(-5, -3));
-    }
-
-    @Test
-    @DisplayName("Тест вычитания")
-    void testSubtractionPositive() {
-        assertEquals(2, Calculations.subtraction(5, 3));
-    }
-
-    @Test
-    @DisplayName("Тест вычитания отрицательных чисел")
-    void testSubtractionNegative() {
-        assertEquals(-8, Calculations.subtraction(-5, 3));
-    }
-
-    @Test
-    @DisplayName("Тест умножения на ноль")
-    void testMultiplicationWithZero() {
-        assertEquals(0, Calculations.multiplication(5, 0));
-        assertEquals(0, Calculations.multiplication(0, 5));
-        assertEquals(0, Calculations.multiplication(0, 0));
-    }
-
-    @Test
-    @DisplayName("Тест умножения положительных чисел")
-    void testMultiplicationPositive() {
-        assertEquals(100, Calculations.multiplication(10, 10));
-    }
-
-    @Test
-    @DisplayName("Тест умножения отрицательных чисел")
-    void testMultiplicationNegative() {
-        assertEquals(100, Calculations.multiplication(-10, -10));
-    }
-
-    @Test
-    @DisplayName("Тест деления положительных чисел")
-    void testDivisionPositive() {
-        assertEquals(2.0, Calculations.division(10, 5));
-    }
-
-    @Test
-    @DisplayName("Тест деления отрицательных чисел")
-    void testDivisionNegative() {
-        assertEquals(2.0, Calculations.division(-10, -5));
-    }
-
-    @Test
-    @DisplayName("Тест деления на ноль")
-    void testDivisionWithZero() {
-        ArithmeticException exception = assertThrows(ArithmeticException.class,
-                () -> Calculations.division(5, 0));
-        assertEquals("Деление на 0 невозможно", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Положительное сравнение чисел")
-    void comparisonTrue(){
-        assertTrue(Calculations.comparison(100, 100));
-    }
-
-    @Test
-    @DisplayName("Отрицательное сравнение чисел")
-    void comparisonFalse(){
-        assertFalse(Calculations.comparison(-100, 100));
-    }
 }
+
+
