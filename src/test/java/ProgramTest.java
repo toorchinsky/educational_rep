@@ -51,23 +51,67 @@ public class ProgramTest {
     }
 
     @Test
-    @DisplayName("Тест на положительные значения массива")
-    void arrayPositive(){
-        int[] actual = Calculations.arithmeticOperations(50, 50);
-        assertArrayEquals(new int[]{100, 0, 1, 2500}, actual);
+    @DisplayName("Тест сложения положительных чисел")
+    void testAdditionPositive() {
+        assertEquals(8, Calculations.addition(5, 3));
     }
 
     @Test
-    @DisplayName("Тест на операции с 0")
-    void arrayZero(){
-        assertThrows(IllegalArgumentException.class, () -> Calculations.arithmeticOperations(0, 1));
+    @DisplayName("Тест сложения отрицательных чисел")
+    void testAdditionNegative() {
+        assertEquals(-8, Calculations.addition(-5, -3));
     }
 
     @Test
-    @DisplayName("Тест на отрицательные значения массива")
-    void arrayNegative(){
-        int[] actual = Calculations.arithmeticOperations(-50, -50);
-        assertArrayEquals(new int[]{-100, 0, 1, 2500}, actual);
+    @DisplayName("Тест вычитания")
+    void testSubtractionPositive() {
+        assertEquals(2, Calculations.subtraction(5, 3));
+    }
+
+    @Test
+    @DisplayName("Тест вычитания отрицательных чисел")
+    void testSubtractionNegative() {
+        assertEquals(-8, Calculations.subtraction(-5, 3));
+    }
+
+    @Test
+    @DisplayName("Тест умножения на ноль")
+    void testMultiplicationWithZero() {
+        assertEquals(0, Calculations.multiplication(5, 0));
+        assertEquals(0, Calculations.multiplication(0, 5));
+        assertEquals(0, Calculations.multiplication(0, 0));
+    }
+
+    @Test
+    @DisplayName("Тест умножения положительных чисел")
+    void testMultiplicationPositive() {
+        assertEquals(100, Calculations.multiplication(10, 10));
+    }
+
+    @Test
+    @DisplayName("Тест умножения отрицательных чисел")
+    void testMultiplicationNegative() {
+        assertEquals(100, Calculations.multiplication(-10, -10));
+    }
+
+    @Test
+    @DisplayName("Тест деления положительных чисел")
+    void testDivisionPositive() {
+        assertEquals(2.0, Calculations.division(10, 5));
+    }
+
+    @Test
+    @DisplayName("Тест деления отрицательных чисел")
+    void testDivisionNegative() {
+        assertEquals(2.0, Calculations.division(-10, -5));
+    }
+
+    @Test
+    @DisplayName("Тест деления на ноль")
+    void testDivisionWithZero() {
+        ArithmeticException exception = assertThrows(ArithmeticException.class,
+                () -> Calculations.division(5, 0));
+        assertEquals("Деление на 0 невозможно", exception.getMessage());
     }
 
     @Test
