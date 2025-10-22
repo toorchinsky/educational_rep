@@ -22,7 +22,7 @@ public class ProgramTest {
     @BeforeEach
     void Start() throws InterruptedException {
         driver = new ChromeDriver();
-        driver.get("https://www.mts.by/");
+        driver.get("https://www.mts.by");
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement closeCookie = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@class = 'cookie__buttons']//button[@class = 'btn btn_gray cookie__cancel']")
@@ -85,7 +85,7 @@ public class ProgramTest {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement payPopup = wait
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath
-                        ("//app-root")));
+                        ("//iframe[@class = 'bepaid-iframe']")));
         assertTrue(payPopup.isDisplayed());
     }
 
