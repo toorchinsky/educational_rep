@@ -1,5 +1,5 @@
 public class Calculations {
-    
+
     public static long factorial(int o){
         if (o < 0){
             throw new IllegalArgumentException("Факториал определяется только для неотрицательных целых чисел");
@@ -18,15 +18,23 @@ public class Calculations {
         return (a * h) / 2;
     }
 
-    public static int[] arithmeticOperations(int a, int b){
-        if (a == 0 || b == 0){
-            throw new IllegalArgumentException("Делеие и умножение на 0 невозможно");
+    public static int addition(int a, int b) {
+        return a + b;
+    }
+
+    public static int subtraction(int a, int b) {
+        return a - b;
+    }
+
+    public static int multiplication(int a, int b) {
+        return a * b;
+    }
+
+    public static double division(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("Деление на 0 невозможно");
         }
-        int addition = a + b;
-        int subtraction = a - b;
-        int multiplication = a * b;
-        int division = a / b;
-        return new int[]{addition, subtraction, division, multiplication};
+        return (double) a / b;
     }
 
     public static boolean comparison(int a, int b){
