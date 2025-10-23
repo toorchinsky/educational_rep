@@ -1,4 +1,5 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -28,12 +29,14 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка названия")
     void blockNameTest() {
         String actual = payBlock.getHeaderText();
         assertEquals("Онлайн пополнение\nбез комиссии", actual);
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка наличия логотипов платежных систем")
     void payLogoTest() {
         assertTrue(payBlock.isVisaLogoDisplayed());
         assertTrue(payBlock.isVerifiedVisaLogoDisplayed());
@@ -43,6 +46,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка работы ссылки «Подробнее о сервисе»")
     void infoLinkTest() {
         payBlock.clickInfoLink();
         String actualLink = payBlock.getCurrentUrl();
@@ -50,6 +54,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - заполнение обязательных полей и проверка работы кнопки «Продолжить»")
     void payButtonTest() {
         payBlock.fillPaymentForm("297777777", "100");
         payBlock.clickContinueButton();
@@ -57,6 +62,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка плэйсхолдеров в разделе «услуги связи»")
     void placeholderConnectionTest() {
         assertEquals("Номер телефона", payBlock.phonePlaceholder());
         assertEquals("Сумма", payBlock.sumPlaceholder());
@@ -64,6 +70,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка плэйсхолдеров в разделе «домашний интернет»")
     void placeholderInternetTest() {
         payBlock.clickServicesButton();
         payBlock.clickHomeInternet();
@@ -73,6 +80,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка плэйсхолдеров в разделе «рассрочка»")
     void placeholderInstallmentTest() {
         payBlock.clickServicesButton();
         payBlock.clickInstallment();
@@ -82,6 +90,7 @@ public class ProgramTest {
     }
 
     @Test
+    @DisplayName("Блок оплаты - проверка плэйсхолдеров в разделе «задолженность»")
     void placeholderArrearsTest() {
         payBlock.clickServicesButton();
         payBlock.clickArrears();
@@ -91,6 +100,8 @@ public class ProgramTest {
     }
 
     @Test
+    @Feature("Попап оплаты")
+    @DisplayName("Попап оплаты - проверка корректного отображения суммы пополнения, номера телефона, плэйсхолдеров, наличие иконок платёжных систем")
     void popupTest(){
         payBlock.fillPaymentForm("297777777", "50");
         payBlock.clickContinueButton();
