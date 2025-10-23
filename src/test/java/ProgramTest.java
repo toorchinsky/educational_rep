@@ -1,18 +1,13 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProgramTest {
     WebDriver driver;
+    PayBlock payBlock;
 
     @BeforeAll
     static void setupAll() {
@@ -20,14 +15,11 @@ public class ProgramTest {
     }
 
     @BeforeEach
-    void Start() throws InterruptedException {
+    void Start() {
         driver = new ChromeDriver();
         driver.get("https://www.mts.by");
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement closeCookie = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@class = 'cookie__buttons']//button[@class = 'btn btn_gray cookie__cancel']")
-        ));
-        closeCookie.click();
+        payBlock = new PayBlock(driver);
+        payBlock.closeCookieBanner();
     }
 
     @AfterEach
@@ -37,58 +29,81 @@ public class ProgramTest {
 
     @Test
     void blockNameTest() {
-        WebElement headText = driver.findElement(By.xpath("//div[@class = 'pay__wrapper']//h2"));
-        String actual = headText.getText();
-        assertEquals("Онлайн пополнение\n" +
-                "без комиссии", actual);
+        String actual = payBlock.getHeaderText();
+        assertEquals("Онлайн пополнение\nбез комиссии", actual);
     }
 
     @Test
-    void payLogoTest(){
-        WebElement visaLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Visa']"));
-        assertTrue(visaLogo.isDisplayed());
-
-        WebElement verifiedVisaLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Verified By Visa']"));
-        assertTrue(verifiedVisaLogo.isDisplayed());
-
-        WebElement masterCardLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'MasterCard']"));
-        assertTrue(masterCardLogo.isDisplayed());
-
-        WebElement masterCardSecureLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'MasterCard Secure Code']"));
-        assertTrue(masterCardSecureLogo.isDisplayed());
-
-        WebElement belacardLogo = driver.findElement(By.xpath("//div[@class = 'pay__partners']//img[@alt = 'Белкарт']"));
-        assertTrue(belacardLogo.isDisplayed());
+    void payLogoTest() {
+        assertTrue(payBlock.isVisaLogoDisplayed());
+        assertTrue(payBlock.isVerifiedVisaLogoDisplayed());
+        assertTrue(payBlock.isMasterCardLogoDisplayed());
+        assertTrue(payBlock.isMasterCardSecureLogoDisplayed());
+        assertTrue(payBlock.isBelacardLogoDisplayed());
     }
 
     @Test
-    void infoLinkTest(){
-        WebElement infoLink = driver.findElement(By.xpath("//div[@class = 'pay__wrapper']//a"));
-        infoLink.click();
-        String actualLink = driver.getCurrentUrl();
+    void infoLinkTest() {
+        payBlock.clickInfoLink();
+        String actualLink = payBlock.getCurrentUrl();
         assertEquals("https://www.mts.by/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/", actualLink);
     }
 
     @Test
     void payButtonTest() {
-        WebElement phoneInput = driver.findElement(By.xpath("//input[@placeholder = 'Номер телефона']"));
-        phoneInput.click();
-        phoneInput.sendKeys("297777777");
-
-        WebElement sumInput = driver.findElement(By.xpath("//form[@class = 'pay-form opened']//input[@class = 'total_rub']"));
-        sumInput.click();
-        sumInput.sendKeys("100");
-
-        WebElement сontinueButton = driver.findElement(By.xpath("//form[@class = 'pay-form opened']//button"));
-        сontinueButton.click();
-
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement payPopup = wait
-                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath
-                        ("//iframe[@class = 'bepaid-iframe']")));
-        assertTrue(payPopup.isDisplayed());
+        payBlock.fillPaymentForm("297777777", "100");
+        payBlock.clickContinueButton();
+        assertTrue(payBlock.isPayPopupDisplayed());
     }
 
+    @Test
+    void placeholderConnectionTest() {
+        assertEquals("Номер телефона", payBlock.phonePlaceholder());
+        assertEquals("Сумма", payBlock.sumPlaceholder());
+        assertEquals("E-mail для отправки чека", payBlock.emailPlaceholder());
+    }
+
+    @Test
+    void placeholderInternetTest() {
+        payBlock.clickServicesButton();
+        payBlock.clickHomeInternet();
+        assertEquals("Номер абонента", payBlock.subPhonePlaceholder());
+        assertEquals("Сумма", payBlock.sumPlaceholder());
+        assertEquals("E-mail для отправки чека", payBlock.emailPlaceholder());
+    }
+
+    @Test
+    void placeholderInstallmentTest() {
+        payBlock.clickServicesButton();
+        payBlock.clickInstallment();
+        assertEquals("Номер счета на 44", payBlock.scorePlaceholder());
+        assertEquals("Сумма", payBlock.sumPlaceholder());
+        assertEquals("E-mail для отправки чека", payBlock.emailPlaceholder());
+    }
+
+    @Test
+    void placeholderArrearsTest() {
+        payBlock.clickServicesButton();
+        payBlock.clickArrears();
+        assertEquals("Номер счета на 2073", payBlock.arrearsPlaceholder());
+        assertEquals("Сумма", payBlock.sumPlaceholder());
+        assertEquals("E-mail для отправки чека", payBlock.emailPlaceholder());
+    }
+
+    @Test
+    void popupTest(){
+        payBlock.fillPaymentForm("297777777", "50");
+        payBlock.clickContinueButton();
+        assertEquals("50.00 BYN", payBlock.getPopupSum());
+        assertEquals("Оплатить 50.00 BYN", payBlock.getPopupSumButton());
+        assertEquals("Оплата: Услуги связи Номер:375297777777", payBlock.getPopupNumber());
+        assertEquals("Номер карты", payBlock.getPopupCardPlaceholder());
+        assertEquals("Срок действия", payBlock.getPopupCardTerm());
+        assertEquals("CVC", payBlock.getPopupCardCvc());
+        assertEquals("Имя и фамилия на карте", payBlock.getPopupCardName());
+        assertTrue(payBlock.isVisaLogoInPopup());
+        assertTrue(payBlock.isMasterCardLogoInPopup());
+        assertTrue(payBlock.isBelkartLogoInPopup());
+        assertTrue(payBlock.isMaestroOrMirLogoInPopup());
+    }
 }
-
-
